@@ -11,23 +11,56 @@ import java.util.Scanner;
 public class Server1CustomSocket {
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(9999);
-        Socket clientSocket = serverSocket.accept();
+        while (true) {
 
-        Scanner scanner = new Scanner(System.in);
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(
-                        clientSocket.getInputStream()));
+            Socket clientSocket = serverSocket.accept();
+            ConnectFromClient connectFromClient = new ConnectFromClient(clientSocket);
+            connectFromClient.start();
+            //Scanner scanner = new Scanner(System.in);
+        }
+    }
+}
 
-        PrintWriter printWriter = new PrintWriter(clientSocket.getOutputStream());
+class ConnectFromClient extends Thread {
+    Socket clientSocket;
+    int i = 0;
+
+    public ConnectFromClient(Socket clientSocket) {
+        this.clientSocket = clientSocket;
+    }
+
+    public void run() {
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(
+                            clientSocket.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        PrintWriter printWriter = null;
+        try {
+            printWriter = new PrintWriter(clientSocket.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         printWriter.println("hello from server");
         printWriter.flush();
         String msqFromClient;
-        while (!"stop".equals(msqFromClient = reader.readLine())) {
-            System.out.println("msq from client= " + msqFromClient);
-            String serverMsq = scanner.nextLine();
-            printWriter.println(serverMsq);
-            printWriter.flush();
+        try {
+            while (!"stop".equals(msqFromClient = reader.readLine())) {
+                System.out.println("msq from client= " + msqFromClient);
+                String serverMsq = String.valueOf(i++);
+                printWriter.println(serverMsq);
+                printWriter.flush();
+                sleep(100);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

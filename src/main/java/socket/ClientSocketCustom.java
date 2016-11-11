@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class ClientSocketCustom {
     public static void main(String[] args) throws IOException {
-        Socket clienScocket = new Socket("192.168.1.129", 9999);
+        Socket clienScocket = new Socket("localhost", 9999);
 
         Scanner scanner = new Scanner(System.in);
         BufferedReader reader = new BufferedReader(
